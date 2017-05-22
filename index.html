@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title> reelyActive Occupancy Demo </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Web demo to estimate occupancy levels by sensing asset motion and by counting the number of detected wireless devices.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style/reelyactive.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.1/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.0/ui-bootstrap-tpls.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+    <script type="text/javascript" src="js/beaver.js"></script>
+    <script type="text/javascript" src="js/occupancy.js"></script>
+  </head>
+  <body ng-app="occupancy">
+    <div ng-controller="OccupancyCtrl">
+      <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle"
+                  ng-init="navCollapsed = true"
+                  ng-click="navCollapsed = !navCollapsed">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="http://www.reelyactive.com">
+            <strong>reely</strong>Active
+          </a>
+        </div>
+        <div class="collapse navbar-collapse" ng-class="!navCollapsed && 'in'"
+             ng-click="navCollapsed = true">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href> Occupancy Demo </a></li>
+          </ul>
+        </div>
+      </nav>
+      <div class="container-fluid">
+        <uib-accordion>
+          <div uib-accordion-group class="panel-default"
+               is-open="displayConnection">
+            <uib-accordion-heading>
+              {{connectionMessage}} <span class="caret"></span>
+            </uib-accordion-heading>
+            <form class="form-inline">
+              <div class="form-group">
+                <label for="url">URL:</label>
+                <input type="url" class="form-control" id="url" ng-model="url"
+                       placeholder="https://pareto.reelyactive.com" size="32">
+              </div>
+              <div class="form-group">
+                <label for="token">&nbsp; Token:</label>
+                <input type="text" class="form-control" id="token" size="32"
+                       ng-model="token" placeholder="Copy from Pareto">
+              </div>
+              <button type="submit" class="btn btn-warning"
+                      ng-click="connect(url,token)">Connect</button>
+              <a href="https://reelyactive.github.io/pareto-socket-client.html"
+                 target="_blank" class="btn btn-default">Help!</a>
+            </form>
+          </div>
+        </uib-accordion>
+        <div class="row" ng-if="connected">
+          <div class="col-md-4">
+            <h1> Filters </h1>
+            <form class="form-inline">
+              <div class="form-group">
+                <label for="rssi">RSSI threshold:</label>
+                <input type="number" class="form-control" id="rssi"
+                       ng-model="rssi" ng-value="rssiThreshold" size="3">
+                <button type="submit" class="btn btn-default"
+                        ng-click="updateFilters(rssi)">Update</button>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-8">
+            <h1> Occupants ({{occupants.length}}) </h1>
+            <table class="table table-hover">
+              <tr>
+                <th> Device ID </th>
+                <th> RSSI </th>
+                <th> URL </th>
+              </tr>
+              <tr ng-repeat="device in occupants | orderBy: '-rssi'">
+                <td> <tt>{{device.deviceId}}</tt> </td>
+                <td> {{device.rssi}} </td>
+                <td> <a ng-href="device.deviceUrl"
+                        target="_blank"> {{device.deviceUrl}} </a> </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <a href="https://github.com/reelyactive/occupancy-web-demo"> occupancy-web-demo </a>
+        &nbsp; | &nbsp;
+        <a href="http://www.reelyactive.com"
+           uib-tooltip="We believe in an open Internet of Things"
+           tooltip-placement="right">
+          &copy; reelyActive 2017
+        </a>
+      </footer>
+    </div>
+  </body>
+</html>
